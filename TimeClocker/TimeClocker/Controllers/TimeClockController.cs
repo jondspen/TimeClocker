@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Web;
 using System.Globalization;
+using TimeClocker.Utilities;
 
 namespace TimeClocker.Controllers
 {
@@ -107,7 +108,7 @@ namespace TimeClocker.Controllers
         [HttpGet]
         public ActionResult Create()
         {
-            ClockTimeModel ctm = new ClockTimeModel() { ClockTime = DateTime.Now, IsClockIn = false };
+            ClockTimeModel ctm = new ClockTimeModel() { ClockTime = CurrentTimeUtilty.ComputeCurrentTimeFromUTC(), IsClockIn = false };
             return View(ctm);
         }
 
@@ -129,7 +130,7 @@ namespace TimeClocker.Controllers
 
             var clockTimes = ReadJsonClockTimes();
             List<ClockTimeModel> prunedTimeList = new List<ClockTimeModel>();
-            var curDTG = DateTime.Now;
+            var curDTG = CurrentTimeUtilty.ComputeCurrentTimeFromUTC();
             CultureInfo myCI = new CultureInfo("en-US");
             Calendar myCal = myCI.Calendar;
 
@@ -158,7 +159,7 @@ namespace TimeClocker.Controllers
                     // get values for the month (not last 30 days)
                     foreach (var item in clockTimes)
                     {
-                        if (DateTime.Now.Month == item.ClockTime.Month)
+                        if (CurrentTimeUtilty.ComputeCurrentTimeFromUTC().Month == item.ClockTime.Month)
                         {
                             prunedTimeList.Add(item);
                         }
@@ -204,13 +205,9 @@ namespace TimeClocker.Controllers
             System.IO.File.WriteAllText(_filepath, jsonData);
         }
 
-        private void AddClockEvent(bool IsClockIn)
+        private void AddClockEvent(bool isClockIn)
         {
-            ClockTimeModel clockTime = new ClockTimeModel() {Id = Guid.NewGuid() , ClockTime = DateTime.Now, IsClockIn = false };
-            if (IsClockIn)
-            {
-                clockTime.IsClockIn = IsClockIn;
-            }
+            ClockTimeModel clockTime = new ClockTimeModel() {Id = Guid.NewGuid() , ClockTime = CurrentTimeUtilty.ComputeCurrentTimeFromUTC(), IsClockIn = isClockIn };
 
             if (!System.IO.File.Exists(_filepath))
             {
@@ -237,7 +234,7 @@ namespace TimeClocker.Controllers
                     if ((i + 1) == prunedTimeList.Count)
                     {
                         // Clock in without a matching clock out.  Compute time on clock from clock in to now.
-                        currentTimeTotals = new TimeTotals() { InTime = currentTimeTotals.InTime, OutTime = DateTime.Now.ToUniversalTime().AddHours(-6), RunningTotal = (DateTime.Now.ToUniversalTime().AddHours(-6).Subtract(currentTimeTotals.InTime)).TotalHours };
+                        currentTimeTotals = new TimeTotals() { InTime = currentTimeTotals.InTime, OutTime = CurrentTimeUtilty.ComputeCurrentTimeFromUTC(), RunningTotal = (CurrentTimeUtilty.ComputeCurrentTimeFromUTC()).Subtract(currentTimeTotals.InTime).TotalHours };
                         timeList.Add(currentTimeTotals);
                     }
                 }
