@@ -1,0 +1,41 @@
+﻿@model IEnumerable<TimeClocker.Models.TimeTotals>
+
+@{
+    ViewBag.Title = "Hours";
+}
+
+<h2>Hours</h2>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.InTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.OutTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RunningTotal)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.InTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OutTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.RunningTotal)
+        </td>
+    </tr>
+}
+    <tr>
+        <td></td>
+        <td><b>Sum Hours:</b></td>
+        <td><b>@Model.Sum(i => i.RunningTotal).ToString("0.00")</b></td>
+    </tr>
+
+</table>

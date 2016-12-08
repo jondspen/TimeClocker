@@ -1,0 +1,37 @@
+﻿@model IEnumerable<TimeClocker.Models.ClockTimeModel>
+
+@{
+    ViewBag.Title = "ShowClockTimes";
+}
+
+<h2>ShowClockTimes</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ClockTime)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.IsClockIn)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.ClockTime)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.IsClockIn)
+        </td>
+        <td>
+            @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+            @Html.ActionLink("Delete", "Delete", new { id=item.Id })
+        </td>
+    </tr>
+}
+</table>
