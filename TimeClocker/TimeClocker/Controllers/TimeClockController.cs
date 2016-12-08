@@ -237,7 +237,7 @@ namespace TimeClocker.Controllers
                     if ((i + 1) == prunedTimeList.Count)
                     {
                         // Clock in without a matching clock out.  Compute time on clock from clock in to now.
-                        currentTimeTotals = new TimeTotals() { InTime = currentTimeTotals.InTime, OutTime = DateTime.Now.ToUniversalTime().AddHours(-6), RunningTotal = (DateTime.Now.Subtract(currentTimeTotals.InTime)).TotalHours };
+                        currentTimeTotals = new TimeTotals() { InTime = currentTimeTotals.InTime, OutTime = DateTime.Now.ToUniversalTime().AddHours(-6), RunningTotal = (DateTime.Now.ToUniversalTime().AddHours(-6).Subtract(currentTimeTotals.InTime)).TotalHours };
                         timeList.Add(currentTimeTotals);
                     }
                 }
