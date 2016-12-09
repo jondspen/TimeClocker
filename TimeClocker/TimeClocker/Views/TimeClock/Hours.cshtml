@@ -6,7 +6,7 @@
 
 <h2>Hours</h2>
 <table class="table">
-    <tr>
+    @*<tr>
         <th>
             @Html.DisplayNameFor(model => model.InTime)
         </th>
@@ -17,9 +17,9 @@
             @Html.DisplayNameFor(model => model.RunningTotal)
         </th>
         <th></th>
-    </tr>
+    </tr>*@
 
-@foreach (var item in Model) {
+@*@foreach (var item in Model) {
     <tr>
         <td>
             @Html.DisplayFor(modelItem => item.InTime)
@@ -31,11 +31,47 @@
             @Html.DisplayFor(modelItem => item.RunningTotal)
         </td>
     </tr>
+}*@
+
+@foreach (var group in Model.GroupBy(item => item.InTime.Day))
+{
+    <tr>
+        <td>
+            <b>Day: @Html.Encode(group.Key)</b>
+            <table>
+                <tr>
+                    <th style="font-weight:normal; font-style:oblique; border-bottom: 1px solid #000000;">
+                        Clock In@*@Html.DisplayNameFor(model => model.InTime)*@
+                    </th>
+                    <th style="font-weight:normal; font-style:oblique; border-bottom: 1px solid #000000;">
+                        Clock Out@*@Html.DisplayNameFor(model => model.OutTime)*@
+                    </th>
+                    <th style="font-weight:normal; font-style:oblique; border-bottom: 1px solid #000000;">
+                        Hours@*@Html.DisplayNameFor(model => model.RunningTotal)*@
+                    </th>
+                    <th></th>
+                </tr>
+
+                @foreach (var item in group)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.InTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OutTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.RunningTotal)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </td>
+    </tr>
 }
     <tr>
-        <td></td>
         <td><b>Sum Hours:</b></td>
         <td><b>@Model.Sum(i => i.RunningTotal).ToString("0.00")</b></td>
     </tr>
-
 </table>
