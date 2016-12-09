@@ -62,16 +62,42 @@
                             @Html.DisplayFor(modelItem => item.OutTime)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.RunningTotal)
+                            @{
+                                var timeSpan = TimeSpan.FromHours(item.RunningTotal);
+                                int iHours = timeSpan.Hours;
+                                int iMins = timeSpan.Minutes;
+                                @Html.Label(iHours.ToString("00") + ":" + iMins.ToString("00"));
+                            }
+                            
                         </td>
                     </tr>
                 }
+                <tr>
+                    <td><b>Daily Hours: </b></td>
+                    <td />
+                    <td>
+                    @{
+                        var dayTimeSpan = TimeSpan.FromHours(group.Sum(i => i.RunningTotal));
+                        int idHours = dayTimeSpan.Hours;
+                        int idMins = dayTimeSpan.Minutes;
+                        @Html.Label(idHours.ToString("00")+":"+ idMins.ToString("00"));
+                    }
+                    </td>
+                </tr>
             </table>
         </td>
     </tr>
 }
     <tr>
-        <td><b>Sum Hours:</b></td>
-        <td><b>@Model.Sum(i => i.RunningTotal).ToString("0.00")</b></td>
+        <td><b>Sum Hours: </b></td>
+        <td>
+            @{
+                var sumTimeSpan = TimeSpan.FromHours(@Model.Sum(i => i.RunningTotal));
+                int isHours = sumTimeSpan.Hours;
+                int isMins = sumTimeSpan.Minutes;
+                @Html.Label(isHours.ToString("00") + ":" + isMins.ToString("00"));
+            }
+        </td>
+
     </tr>
 </table>
