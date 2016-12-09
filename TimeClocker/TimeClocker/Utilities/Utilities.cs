@@ -6,20 +6,17 @@ namespace TimeClocker.Utilities
     {
         public static DateTime ComputeCurrentTimeFromUTC()
         {
-            System.Configuration.Configuration rootWebConfig1 = System.Web.Configuration.WebConfigurationManager.OpenWebConfiguration(null);
-            if (rootWebConfig1.AppSettings.Settings.Count > 0)
+            var stringOffset = System.Configuration.ConfigurationManager.AppSettings["LocalTimeUtcOffset"].ToString();
+
+            int result;
+            if (int.TryParse(stringOffset, out result))
             {
-                System.Configuration.KeyValueConfigurationElement customSetting = rootWebConfig1.AppSettings.Settings["LocalTimeUtcOffset"];
-
-                int result;
-                if (int.TryParse(customSetting.Value, out result))
-                {
-                    return DateTime.Now.ToUniversalTime().AddHours(result);
-                }
+                return DateTime.Now.ToUniversalTime().AddHours(result);
             }
-
-            // Default to US Central Standard Time
-            return DateTime.Now.ToUniversalTime().AddHours(-6);
+            else
+            {
+                return DateTime.Now.ToUniversalTime().AddHours(-6);
+            }
         }
     }
 }
