@@ -1,103 +1,52 @@
-﻿@model IEnumerable<TimeClocker.Models.TimeTotals>
+﻿@using TimeClocker.Models
+@model IEnumerable<IGrouping<int, IGrouping<int, TimeTotalsModel>>>
 
 @{
-    ViewBag.Title = "Hours";
+    ViewBag.Title = "Total Hours";
 }
 
-<h2>Hours</h2>
+<h2>Total Hours</h2>
+
 <table class="table">
-    @*<tr>
-        <th>
-            @Html.DisplayNameFor(model => model.InTime)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.OutTime)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.RunningTotal)
-        </th>
-        <th></th>
-    </tr>*@
-
-@*@foreach (var item in Model) {
     <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.InTime)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.OutTime)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.RunningTotal)
-        </td>
+        <th>In Time</th>
+        <th>Out Time</th>
+        <th>Total</th>
     </tr>
-}*@
 
-@foreach (var group in Model.GroupBy(item => item.InTime.Day))
-{
-    <tr>
-        <td>
-            <b>Day: @Html.Encode(group.Key)</b>
-            <table>
+    @foreach (var itemMonth in Model)
+    {
+        <tr><td><h3>Month Of Year: @Html.Encode(itemMonth.Key)</h3></td></tr>
+        foreach (var itemDay in itemMonth)
+        {
+            foreach (var item in itemDay)
+            {
                 <tr>
-                    <th style="font-weight:normal; font-style:oblique; border-bottom: 1px solid #000000;">
-                        Clock In@*@Html.DisplayNameFor(model => model.InTime)*@
-                    </th>
-                    <th style="font-weight:normal; font-style:oblique; border-bottom: 1px solid #000000;">
-                        Clock Out@*@Html.DisplayNameFor(model => model.OutTime)*@
-                    </th>
-                    <th style="font-weight:normal; font-style:oblique; border-bottom: 1px solid #000000;">
-                        Hours@*@Html.DisplayNameFor(model => model.RunningTotal)*@
-                    </th>
-                    <th></th>
-                </tr>
-
-                @foreach (var item in group)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.InTime)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.OutTime)
-                        </td>
-                        <td>
-                            @{
-                                var timeSpan = TimeSpan.FromHours(item.RunningTotal);
-                                int iHours = timeSpan.Hours;
-                                int iMins = timeSpan.Minutes;
-                                @Html.Label(iHours.ToString("00") + ":" + iMins.ToString("00"));
-                            }
-                            
-                        </td>
-                    </tr>
-                }
-                <tr>
-                    <td><b>Daily Hours: </b></td>
-                    <td />
+                    <td>@item.InTime</td>
+                    <td>@item.OutTime</td>
                     <td>
+                        @{
+                            var timeSpan = TimeSpan.FromHours(item.TimeDelta);
+                            int iHours = timeSpan.Hours;
+                            int iMins = timeSpan.Minutes;
+                            @Html.Label(iHours.ToString("00") + ":" + iMins.ToString("00"));
+                        }
+                    </td>
+
+                </tr>
+            }
+            <tr style="background-color:darkgray; color:black">
+                <td />
+                <td><h4><b>Day Totals for <i>@Html.Encode(itemDay.Key):</i></b></h4></td>
+                <td>
                     @{
-                        var dayTimeSpan = TimeSpan.FromHours(group.Sum(i => i.RunningTotal));
+                        var dayTimeSpan = TimeSpan.FromHours(itemDay.Sum(t => t.TimeDelta));
                         int idHours = dayTimeSpan.Hours;
                         int idMins = dayTimeSpan.Minutes;
-                        @Html.Label(idHours.ToString("00")+":"+ idMins.ToString("00"));
+                        <h4>@Html.Label(idHours.ToString("00") + ":" + idMins.ToString("00"))</h4>
                     }
-                    </td>
-                </tr>
-            </table>
-        </td>
-    </tr>
-}
-    <tr>
-        <td><b>Sum Hours: </b></td>
-        <td>
-            @{
-                var sumTimeSpan = TimeSpan.FromHours(@Model.Sum(i => i.RunningTotal));
-                int isHours = sumTimeSpan.Hours;
-                int isMins = sumTimeSpan.Minutes;
-                @Html.Label(isHours.ToString("00") + ":" + isMins.ToString("00"));
-            }
-        </td>
-
-    </tr>
+                </td>
+            </tr>
+        }
+    }
 </table>

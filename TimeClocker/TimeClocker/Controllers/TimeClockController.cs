@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Web;
 using System.Globalization;
 using TimeClocker.Utilities;
+using System.Linq;
 
 namespace TimeClocker.Controllers
 {
@@ -123,67 +124,29 @@ namespace TimeClocker.Controllers
             return RedirectToAction("ShowClockTimes");
         }
 
-        public ActionResult Hours(int span)
+        public ActionResult Hours(string span = "day")
         {
-            List<TimeTotals> timeTotals = new List<TimeTotals>();
-            
-
-            var clockTimes = ReadJsonClockTimes();
             List<ClockTimeModel> prunedTimeList = new List<ClockTimeModel>();
-            var curDTG = CurrentTimeUtilty.ComputeCurrentTimeFromUTC();
-            CultureInfo myCI = new CultureInfo("en-US");
-            Calendar myCal = myCI.Calendar;
 
-            switch (span)
-            {
-                case 7:
-                    // get values for the current week (not past 7 days)
-                    var curWeek = myCal.GetWeekOfYear(curDTG, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday);
+            prunedTimeList = PruneTimesFromList(ReadJsonClockTimes(), span);
+            var timeTotals = ComputeTotalHours(prunedTimeList);
+            var groupedTimes = from time in timeTotals
+                             group time by time.InTime.Month into newGroupByMonth
+                             from newGroupByDay in (from time in newGroupByMonth
+                                                    orderby time.InTime.Day
+                                                    group time by time.InTime.Day)
+                             group newGroupByDay by newGroupByMonth.Key;
 
-                    // prune the tree of times NOT in the current week
-                    foreach (var item in clockTimes)
-                    {
-                        var checkWeek = myCal.GetWeekOfYear(item.ClockTime, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday);
+            return View(groupedTimes);
+        }
 
-                        if (curWeek == checkWeek)
-                        {
-                            prunedTimeList.Add(item);
-                        }
-                    }
+        public ActionResult TestHours()
+        {
+            var tempTime = (List<IGrouping<int, ClockTimeModel>>)TempData["myTempTime"];
 
-                    timeTotals = ComputeTotalHours(prunedTimeList);
+            return View(tempTime);
+        }
 
-                    break;
-
-                case 30:
-                    // get values for the month (not last 30 days)
-                    foreach (var item in clockTimes)
-                    {
-                        if (CurrentTimeUtilty.ComputeCurrentTimeFromUTC().Month == item.ClockTime.Month)
-                        {
-                            prunedTimeList.Add(item);
-                        }
-                    }
-
-                    timeTotals = ComputeTotalHours(prunedTimeList);
-                    break;
-
-                default:
-                    // assuming only today's clock in/out
-                    foreach (var item in clockTimes)
-                    {
-                        if (curDTG.Date.CompareTo(item.ClockTime.Date) == 0)
-                        {
-                            prunedTimeList.Add(item);
-                        }
-                    }
-
-                    timeTotals = ComputeTotalHours(prunedTimeList);
-                    break;
-            }
-
-            return View(timeTotals);
-        }        
         #endregion
 
         #region private methods
@@ -220,10 +183,10 @@ namespace TimeClocker.Controllers
             WriteClockTimesToFile(clockTimes);
         }
 
-        private List<TimeTotals> ComputeTotalHours(List<ClockTimeModel> prunedTimeList)
+        private List<TimeTotalsModel> ComputeTotalHours(List<ClockTimeModel> prunedTimeList)
         {
-            List<TimeTotals> timeList = new List<TimeTotals>();
-            TimeTotals currentTimeTotals = new TimeTotals();
+            List<TimeTotalsModel> timeList = new List<TimeTotalsModel>();
+            TimeTotalsModel currentTimeTotals = new TimeTotalsModel();
 
             for (int i = 0; i < prunedTimeList.Count; i++)
             {
@@ -234,7 +197,7 @@ namespace TimeClocker.Controllers
                     if ((i + 1) == prunedTimeList.Count)
                     {
                         // Clock in without a matching clock out.  Compute time on clock from clock in to now.
-                        currentTimeTotals = new TimeTotals() { InTime = currentTimeTotals.InTime, OutTime = CurrentTimeUtilty.ComputeCurrentTimeFromUTC(), RunningTotal = (CurrentTimeUtilty.ComputeCurrentTimeFromUTC()).Subtract(currentTimeTotals.InTime).TotalHours };
+                        currentTimeTotals = new TimeTotalsModel() { InTime = currentTimeTotals.InTime, OutTime = CurrentTimeUtilty.ComputeCurrentTimeFromUTC(), TimeDelta = (CurrentTimeUtilty.ComputeCurrentTimeFromUTC()).Subtract(currentTimeTotals.InTime).TotalHours };
                         timeList.Add(currentTimeTotals);
                     }
                 }
@@ -242,14 +205,65 @@ namespace TimeClocker.Controllers
                 {
                     currentTimeTotals.OutTime = prunedTimeList[i].ClockTime;
                     // currentTimeTotals.RunningDailyTotal += (currentTimeTotals.OutTime.Subtract(currentTimeTotals.InTime)).TotalHours;
-                    currentTimeTotals.RunningTotal = (currentTimeTotals.OutTime.Subtract(currentTimeTotals.InTime)).TotalHours;
+                    currentTimeTotals.TimeDelta = (currentTimeTotals.OutTime.Subtract(currentTimeTotals.InTime)).TotalHours;
                     timeList.Add(currentTimeTotals);
 
-                    currentTimeTotals = new TimeTotals();
+                    currentTimeTotals = new TimeTotalsModel();
                 }
             }
 
             return timeList;
+        }
+
+        private List<ClockTimeModel> PruneTimesFromList(List<ClockTimeModel> inputList)
+        {
+            return PruneTimesFromList(inputList, "day");
+        }
+
+        private List<ClockTimeModel> PruneTimesFromList(List<ClockTimeModel> inputList, string period)
+        {
+            DateTime curDTG = CurrentTimeUtilty.ComputeCurrentTimeFromUTC();
+            var prunedList = new List<ClockTimeModel>();
+
+            switch (period.ToLower())
+            {
+                case "month":
+                    foreach (var item in inputList)
+                    {
+                        if (CurrentTimeUtilty.ComputeCurrentTimeFromUTC().Month == item.ClockTime.Month)
+                        {
+                            prunedList.Add(item);
+                        }
+                    }
+                    break;
+
+                case "week":
+                    CultureInfo myCI = new CultureInfo("en-US");
+                    Calendar myCal = myCI.Calendar;
+
+                    int curWeek = myCal.GetWeekOfYear(curDTG, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday);
+                    foreach (var item in inputList)
+                    {
+                        var checkWeek = myCal.GetWeekOfYear(item.ClockTime, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday);
+
+                        if (curWeek == checkWeek)
+                        {
+                            prunedList.Add(item);
+                        }
+                    }
+                    break;
+
+                default:
+                    foreach (var item in inputList)
+                    {
+                        if (curDTG.Date.CompareTo(item.ClockTime.Date) == 0)
+                        {
+                            prunedList.Add(item);
+                        }
+                    }
+                    break;
+            }
+            return prunedList;
         }
         #endregion
     }

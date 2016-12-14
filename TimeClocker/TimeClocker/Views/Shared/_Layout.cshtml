@@ -21,9 +21,9 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Show Times", "ShowClockTimes", "TimeClock")</li>
-                    <li>@Html.ActionLink("Day Hrs", "Hours", "TimeClock", new { span = 1 }, null)</li>
-                    <li>@Html.ActionLink("Week Hrs", "Hours", "TimeClock", new { span = 7 }, null)</li>
-                    <li>@Html.ActionLink("Month Hrs", "Hours", "TimeClock", new { span = 30 }, null)</li>
+                    <li>@Html.ActionLink("Day Hrs", "Hours", "TimeClock", new { span = "day" }, null)</li>
+                    <li>@Html.ActionLink("Week Hrs", "Hours", "TimeClock", new { span = "week" }, null)</li>
+                    <li>@Html.ActionLink("Month Hrs", "Hours", "TimeClock", new { span = "month" }, null)</li>
                 </ul>
             </div>
         </div>
