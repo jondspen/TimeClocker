@@ -84,7 +84,7 @@ namespace TimeClocker.Controllers
 
             WriteClockTimesToFile(clockTimes);
 
-            return View(ctm);
+            return RedirectToAction("ShowClockTimes", "TimeClock");
         }
 
         public ActionResult Delete(Guid id)
