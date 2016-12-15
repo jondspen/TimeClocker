@@ -137,6 +137,9 @@ namespace TimeClocker.Controllers
                                                     group time by time.InTime.Day)
                              group newGroupByDay by newGroupByMonth.Key;
 
+            TextInfo myTI = new CultureInfo("en-US", false).TextInfo;
+            ViewBag.Span = myTI.ToTitleCase(span);
+
             return View(groupedTimes);
         }
 
@@ -228,6 +231,7 @@ namespace TimeClocker.Controllers
             switch (period.ToLower())
             {
                 case "month":
+                    ViewBag.PeriodID = CurrentTimeUtilty.ComputeCurrentTimeFromUTC().Month;
                     foreach (var item in inputList)
                     {
                         if (CurrentTimeUtilty.ComputeCurrentTimeFromUTC().Month == item.ClockTime.Month)
@@ -242,6 +246,8 @@ namespace TimeClocker.Controllers
                     Calendar myCal = myCI.Calendar;
 
                     int curWeek = myCal.GetWeekOfYear(curDTG, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday);
+                    ViewBag.PeriodID = curWeek;
+
                     foreach (var item in inputList)
                     {
                         var checkWeek = myCal.GetWeekOfYear(item.ClockTime, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday);
@@ -259,6 +265,7 @@ namespace TimeClocker.Controllers
                         if (curDTG.Date.CompareTo(item.ClockTime.Date) == 0)
                         {
                             prunedList.Add(item);
+                            ViewBag.PeriodID = item.ClockTime.Day.ToString() + " - " + item.ClockTime.DayOfWeek.ToString();
                         }
                     }
                     break;
