@@ -6,7 +6,7 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{F65C666A-9507-4532-8603-122C650BC697}</ProjectGuid>
+    <ProjectGuid>{31C6E0DF-E59C-4A2D-9E3B-3F6BEF79101D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TimeClocker.Tests</RootNamespace>
@@ -93,7 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TimeClocker\TimeClocker.csproj">
-      <Project>{3B802141-F305-4954-9B9F-431772DCDDA9}</Project>
+      <Project>{EB3D7DE6-9A89-41D4-A9FF-175B7B419A62}</Project>
       <Name>TimeClocker</Name>
     </ProjectReference>
   </ItemGroup>
