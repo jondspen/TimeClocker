@@ -2,28 +2,20 @@
     ViewBag.Title = "Home Page";
 }
 
+
 <div>
     <h1>Time Clocker</h1>
     <p>Time entry</p>
 
+    <div style="text-align:center">
+        @using (Html.BeginForm("ClockIn", "TimeClock", FormMethod.Post, new { style = "display:inline" }))
+        {
+            <input type="submit" value="Clock In" />
+        }
 
-    @if (User.Identity.IsAuthenticated)
-    {
-        <div style="text-align:center">
-            @using (Html.BeginForm("ClockIn", "TimeClock", FormMethod.Post, new { style = "display:inline" }))
-            {
-                <input type="submit" value="Clock IN" />
-            }
-
-            @using (Html.BeginForm("ClockOut", "TimeClock", FormMethod.Post, new { style = "display:inline" }))
-            {
-                <input type="submit" value="Clock OUT" />
-            }
-        </div>
-    }
-    else
-    {
-        <div style="text-align:center">Login to continue...</div>
-    }
-
+        @using (Html.BeginForm("ClockOut", "TimeClock", FormMethod.Post, new { style = "display:inline" }))
+        {
+            <input type="submit" value="Clock Out" />
+        }
+    </div>
 </div>

@@ -142,6 +142,14 @@ namespace TimeClocker.Controllers
 
             return View(groupedTimes);
         }
+
+        public ActionResult TestHours()
+        {
+            var tempTime = (List<IGrouping<int, ClockTimeModel>>)TempData["myTempTime"];
+
+            return View(tempTime);
+        }
+
         #endregion
 
         #region private methods
