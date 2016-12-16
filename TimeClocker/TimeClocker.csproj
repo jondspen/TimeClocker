@@ -163,10 +163,13 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\TimeClock\Create.cshtml" />
+    <Content Include="Views\TimeClock\Edit.cshtml" />
+    <Content Include="Views\TimeClock\Hours.cshtml" />
+    <Content Include="Views\TimeClock\ShowClockTimes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\TimeClock\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
