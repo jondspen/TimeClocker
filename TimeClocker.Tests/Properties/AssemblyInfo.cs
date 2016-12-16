@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("TimeClocker")]
+[assembly: AssemblyTitle("TimeClocker.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Perseus Books Group")]
-[assembly: AssemblyProduct("TimeClocker")]
+[assembly: AssemblyProduct("TimeClocker.Tests")]
 [assembly: AssemblyCopyright("Copyright © Perseus Books Group 2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("b5525a9f-a4cc-4cb0-966d-fe7c6ea199fc")]
+[assembly: Guid("f04e27df-6585-433b-b1e9-e7fc3188dab8")]
 
 // Version information for an assembly consists of the following four values:
 //

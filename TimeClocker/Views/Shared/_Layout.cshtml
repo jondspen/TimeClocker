@@ -6,6 +6,7 @@
     <title>@ViewBag.Title</title>
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
+
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -25,6 +26,7 @@
                     <li>@Html.ActionLink("Week Hrs", "Hours", "TimeClock", new { span = "week" }, null)</li>
                     <li>@Html.ActionLink("Month Hrs", "Hours", "TimeClock", new { span = "month" }, null)</li>
                 </ul>
+                @Html.Partial("_LoginPartial")
             </div>
         </div>
     </div>

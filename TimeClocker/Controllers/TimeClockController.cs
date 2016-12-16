@@ -7,32 +7,37 @@ using System.Web;
 using System.Globalization;
 using TimeClocker.Utilities;
 using System.Linq;
+using Microsoft.AspNet.Identity;
 
 namespace TimeClocker.Controllers
 {
     public class TimeClockController : Controller
     {
         #region variables
-        private string _filepath = HttpRuntime.AppDomainAppPath + @"App_Data\TimeClocker.JSON";
+        private string _filepath;
         #endregion
 
         #region ActionResults
         // GET: TimeClock
+        [Authorize]
         public ActionResult ClockIn()
         {
             AddClockEvent(true);
             return RedirectToAction("ShowClockTimes");
         }
 
+        [Authorize]
         public ActionResult ClockOut()
         {
             AddClockEvent(false);
             return RedirectToAction("ShowClockTimes");
         }
 
+        [Authorize]
         public ActionResult ShowClockTimes()
         {
             List<ClockTimeModel> clockTimes = new List<ClockTimeModel>();
+            _filepath = HttpRuntime.AppDomainAppPath + @"App_Data\" + User.Identity.GetUserId().GetHashCode().ToString() + "TimeClocker.JSON";
 
             if (System.IO.File.Exists(_filepath))
             {
@@ -42,6 +47,7 @@ namespace TimeClocker.Controllers
             return View(clockTimes);
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult Edit(Guid id)
         {
@@ -67,6 +73,7 @@ namespace TimeClocker.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult Edit (ClockTimeModel ctm)
         {
@@ -87,6 +94,7 @@ namespace TimeClocker.Controllers
             return RedirectToAction("ShowClockTimes", "TimeClock");
         }
 
+        [Authorize]
         public ActionResult Delete(Guid id)
         {
             var clockTimes = ReadJsonClockTimes();
@@ -106,6 +114,7 @@ namespace TimeClocker.Controllers
 
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult Create()
         {
@@ -113,6 +122,7 @@ namespace TimeClocker.Controllers
             return View(ctm);
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult Create(ClockTimeModel ctm)
         {
@@ -124,6 +134,7 @@ namespace TimeClocker.Controllers
             return RedirectToAction("ShowClockTimes");
         }
 
+        [Authorize]
         public ActionResult Hours(string span = "day")
         {
             List<ClockTimeModel> prunedTimeList = new List<ClockTimeModel>();
@@ -142,19 +153,13 @@ namespace TimeClocker.Controllers
 
             return View(groupedTimes);
         }
-
-        public ActionResult TestHours()
-        {
-            var tempTime = (List<IGrouping<int, ClockTimeModel>>)TempData["myTempTime"];
-
-            return View(tempTime);
-        }
-
         #endregion
 
         #region private methods
         private List<ClockTimeModel> ReadJsonClockTimes()
         {
+            _filepath = HttpRuntime.AppDomainAppPath + @"App_Data\" + User.Identity.GetUserId().GetHashCode().ToString() + "TimeClocker.JSON";
+
             if (!System.IO.File.Exists(_filepath))
             {
                 System.IO.File.Create(_filepath).Close();
@@ -167,6 +172,8 @@ namespace TimeClocker.Controllers
 
         private void WriteClockTimesToFile(List<ClockTimeModel> clockTimes)
         {
+            _filepath = HttpRuntime.AppDomainAppPath + @"App_Data\" + User.Identity.GetUserId().GetHashCode().ToString() + "TimeClocker.JSON";
+
             var jsonData = JsonConvert.SerializeObject(clockTimes);
             System.IO.File.WriteAllText(_filepath, jsonData);
         }
@@ -174,6 +181,7 @@ namespace TimeClocker.Controllers
         private void AddClockEvent(bool isClockIn)
         {
             ClockTimeModel clockTime = new ClockTimeModel() {Id = Guid.NewGuid() , ClockTime = CurrentTimeUtilty.ComputeCurrentTimeFromUTC(), IsClockIn = isClockIn };
+            _filepath = HttpRuntime.AppDomainAppPath + @"App_Data\" + User.Identity.GetUserId().GetHashCode().ToString() + "TimeClocker.JSON";
 
             if (!System.IO.File.Exists(_filepath))
             {
