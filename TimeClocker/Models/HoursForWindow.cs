@@ -10,6 +10,6 @@ namespace TimeClocker.Models
         public DateTime StartDate { get; set; }
         public int DaySpan { get; set; }
 
-        public List<ClockTimeModel> ClockTimeList { get; set; }
+        public List<TimeTotalsModel> TimeTotalsList { get; set; }
     }
 }

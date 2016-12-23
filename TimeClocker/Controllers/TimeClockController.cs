@@ -146,10 +146,12 @@ namespace TimeClocker.Controllers
         [HttpGet]
         public ActionResult WindowHours()
         {
-            HoursForWindow myH4W = new HoursForWindow();
-            myH4W.StartDate = DateTime.Now;
-            myH4W.DaySpan = 7;
-            myH4W.ClockTimeList = new List<ClockTimeModel>();
+            HoursForWindow myH4W = new HoursForWindow()
+            {
+                StartDate = DateTime.Now,
+                DaySpan = 1,
+                TimeTotalsList = new List<TimeTotalsModel>()
+            };
 
             return View(myH4W);
         }
@@ -157,9 +159,12 @@ namespace TimeClocker.Controllers
         [HttpPost]
         public ActionResult WindowHours(DateTime startDate, int daySpan)
         {
-            HoursForWindow myH4W = new HoursForWindow() { DaySpan = daySpan,
+            HoursForWindow myH4W = new HoursForWindow()
+            {
+                DaySpan = daySpan,
                 StartDate = startDate,
-                ClockTimeList = PruneTimesFromList(ReadJsonClockTimes(), startDate, daySpan) };
+                TimeTotalsList = ComputeTotalHours(PruneTimesFromList(ReadJsonClockTimes(), startDate, daySpan))
+            };
 
             return View(myH4W);
         }
@@ -226,6 +231,11 @@ namespace TimeClocker.Controllers
 
                     currentTimeTotals = new TimeTotalsModel();
                 }
+            }
+
+            if (prunedTimeList.Count == 0)
+            {
+                timeList.Add(currentTimeTotals);
             }
 
             return timeList;

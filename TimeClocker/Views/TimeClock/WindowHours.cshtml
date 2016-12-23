@@ -1,10 +1,10 @@
 ﻿@model TimeClocker.Models.HoursForWindow
 
 @{
-    ViewBag.Title = "WindowHours";
+    ViewBag.Title = "PeriodHours";
 }
 
-<h2>WindowHours</h2>
+<h2>Hours for Selected Period</h2>
 
 <div name="SelectStartAndSpan">
     @using (Html.BeginForm("WindowHours", "TimeClock", FormMethod.Post))
@@ -20,31 +20,39 @@
 <div name="ListItems">
     <table class="table">
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ClockTimeList[0].ClockTime)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ClockTimeList[0].IsClockIn)
-            </th>
-            <th></th>
+            <th>In Time</th>
+            <th>Out Time</th>
+            <th>Total</th>
         </tr>
-
-        @foreach (var item in Model.ClockTimeList)
+        @{double periodTotal = 0.0; }
+        <tr style="background-color:black; color:white"><td colspan="3" style="text-align:center"></td></tr>
+        @if (Model.TimeTotalsList.Count() == 0)
+        {
+            <tr><td></td></tr>
+        }
+        @foreach (var item in Model.TimeTotalsList)
         {
             <tr>
+                <td>@item.InTime</td>
+                <td>@item.OutTime</td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.ClockTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsClockIn)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    @{
+                        var timeSpan = TimeSpan.FromHours(item.TimeDelta);
+                        int iHours = timeSpan.Hours;
+                        int iMins = timeSpan.Minutes;
+                        @Html.Label(iHours.ToString("00") + ":" + iMins.ToString("00"));
+                        periodTotal += iHours + (((double)iMins) / 60);
+                    }
                 </td>
             </tr>
         }
-
+        <tr style="background-color:black; color:white">
+            @{
+                int ttlHrs = (int)periodTotal;
+                int ttlMin = (int)((periodTotal % 1) * 60);
+                string ttlClockHrs = ttlHrs.ToString() + ":" + ttlMin.ToString();
+                <td colspan="3" style="text-align:center"><h3>Period Total:  @ttlClockHrs</h3></td>
+            }
+        </tr>
     </table>
 </div>
