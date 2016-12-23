@@ -143,13 +143,26 @@ namespace TimeClocker.Controllers
             return View(groupedTimes);
         }
 
-        public ActionResult TestHours()
+        [HttpGet]
+        public ActionResult WindowHours()
         {
-            var tempTime = (List<IGrouping<int, ClockTimeModel>>)TempData["myTempTime"];
+            HoursForWindow myH4W = new HoursForWindow();
+            myH4W.StartDate = DateTime.Now;
+            myH4W.DaySpan = 7;
+            myH4W.ClockTimeList = new List<ClockTimeModel>();
 
-            return View(tempTime);
+            return View(myH4W);
         }
 
+        [HttpPost]
+        public ActionResult WindowHours(DateTime startDate, int daySpan)
+        {
+            HoursForWindow myH4W = new HoursForWindow() { DaySpan = daySpan,
+                StartDate = startDate,
+                ClockTimeList = PruneTimesFromList(ReadJsonClockTimes(), startDate, daySpan) };
+
+            return View(myH4W);
+        }
         #endregion
 
         #region private methods
@@ -270,6 +283,24 @@ namespace TimeClocker.Controllers
                     }
                     break;
             }
+            return prunedList;
+        }
+
+        private List<ClockTimeModel> PruneTimesFromList(List<ClockTimeModel> inputList, DateTime startDay, int daySpan)
+        {
+            DateTime curDTG = CurrentTimeUtilty.ComputeCurrentTimeFromUTC();
+            var prunedList = new List<ClockTimeModel>();
+
+            DateTime endDay = startDay.AddDays(daySpan);
+
+            foreach (var item in inputList)
+            {
+                if ((item.ClockTime >= startDay) && (item.ClockTime < endDay))
+                {
+                    prunedList.Add(item);
+                }
+            }
+
             return prunedList;
         }
         #endregion
